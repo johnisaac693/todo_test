@@ -211,5 +211,6 @@ export default {
       return this.tasks.filter((task) => task.done).length;
     }
   }
+  //GIRL I SWEAR TO GOD IF THIS WORKS
 }
 </script>
