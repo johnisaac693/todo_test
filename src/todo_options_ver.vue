@@ -1,6 +1,8 @@
 <template>
   <div class="max-w-md mx-auto mt-8 p-4 border border-gray-300 rounded-lg bg-gray-50 font-sans">
     <h1 class="text-center text-2xl font-semibold mb-4">To-Do List</h1>
+    <!--Toast Message -->
+    <div v-if="showToast" class="fixed top-5 right-5 bg-black text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in-out">{{ toastMessage }}</div>
 
     <!--INPUT AREA-->
     <div class="flex mb-4">
@@ -104,6 +106,7 @@
       Number of Tasks: {{ tasktotal }} | Completed Tasks: {{ completedCount }}
     </p>
 
+    <!-- <p class="text-center text-base mt-4 p-2 bg-cyan-100 text-cyan-800 border border-cyan-200 rounded shadow-sm">-->
     <button
         v-if="tasks.length > 0"
         @click="confirmClearAll"
@@ -125,6 +128,8 @@ export default {
   name: "todo_options_ver",
   data() {
     return {
+      toastMessage: '',
+      showToast: false,
       newTask: '',
       tasks: (JSON.parse(localStorage.getItem("tasks")) || []).map(task => ({
         ...task,
@@ -141,10 +146,18 @@ export default {
     }
   },
   methods: {
+    showToastMessage(message){
+      this.toastMessage = message;
+      this.showToast = true;
+     setTimeout(() => {
+      this.showToast = false;
+     }, 2000
+     );
+    },
     addTask() {
       const trimmed = this.newTask.trim();
       if (trimmed === '') {
-        alert("ENTER A TASK BITCH! WE DON'T ACCEPT EMPTY SHIT!");
+        this.showToastMessage("Please enter a task!");
       } else {
         this.tasks.push({text: trimmed, done: false});
         this.newTask = '';
@@ -160,7 +173,7 @@ export default {
       const confirmed = window.confirm("Do you really want to clear all tasks?");
       if (confirmed) {
         this.clearAllTasks();
-        alert("All tasks have been cleared");
+        this.showToastMessage("All tasks have been cleared");
       }
     },
     clearAllTasks() {
@@ -184,7 +197,7 @@ export default {
     copyAllTasks() {
       const allTasksText = this.tasks.map(task => task.text).join('\n');
       navigator.clipboard.writeText(allTasksText).then(() => {
-        alert('All tasks copied to clipboard!');
+        this.showToastMessage('All tasks copied to clipboard!');
       }).catch((err) => {
         console.error('Failed to copy tasks: ', err);
       });
@@ -194,7 +207,7 @@ export default {
     },
     saveEdit(task) {
       if (task.text.trim() === "") {
-        alert("Task cannot be empty.");
+        this.showToastMessage("Task cannot be empty.");
         return;
       }
       task.text = task.text.trim();
@@ -214,3 +227,13 @@ export default {
   //GIRL I SWEAR TO GOD IF THIS WORKS
 }
 </script>
+<style>
+@keyframes fade-in-out {
+  0%{opacity: 0; transform: translateY(-10px);}
+  10%, 90% {opacity: 1; transform: translateY(0);}
+  100%{opacity: 0; transform: translateY(-10px);}
+}
+.animate-fade-in-out {
+  animation: fade-in-out 3s ease-in-out forwards;
+}
+</style>
