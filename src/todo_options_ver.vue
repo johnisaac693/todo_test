@@ -121,6 +121,7 @@
     </button>
 
   </div>
+<vue3-snackbar bottom></vue3-snackbar>
 </template>
 
 <script>
@@ -154,10 +155,30 @@ export default {
      }, 2000
      );
     },
+    snackbarSuccessMessage(message){
+      this.$snackbar.add(
+          {
+            type: 'success',
+            text: message,
+            bottom: true,
+            duration: 2000
+          }
+      )
+    },
+    snackbarErrorMessage(message){
+      this.$snackbar.add(
+          {
+            type: 'error',
+            text: message,
+            bottom: true,
+            duration: 2000
+          }
+      )
+    },
     addTask() {
       const trimmed = this.newTask.trim();
       if (trimmed === '') {
-        this.showToastMessage("Please enter a task!");
+        this.snackbarErrorMessage('Please enter a valid task');
       } else {
         this.tasks.push({text: trimmed, done: false});
         this.newTask = '';
@@ -173,7 +194,7 @@ export default {
       const confirmed = window.confirm("Do you really want to clear all tasks?");
       if (confirmed) {
         this.clearAllTasks();
-        this.showToastMessage("All tasks have been cleared");
+        this.snackbarSuccessMessage('All tasks have been deleted.');
       }
     },
     clearAllTasks() {
