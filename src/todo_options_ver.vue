@@ -21,10 +21,10 @@
       </button>
     </div>
 
-    <ul class="space-y-2">
-      <li
+    <transition-group name ="task" tag = "div" class="space-y-2">
+      <div
           v-for="(task, index) in tasks"
-          :key="index"
+          :key="task.id"
           class="cursor-pointer flex flex-wrap justify-between items-start bg-gray-200 p-2 rounded-md hover:bg-gray-300"
       >
         <div class="flex-1 break-words">
@@ -97,9 +97,9 @@
             </svg>
           </button>
         </div>
-      </li>
+      </div>
 
-    </ul>
+    </transition-group>
 
 
     <p class="text-center text-base mt-4 p-2 bg-cyan-100 text-cyan-800 border border-cyan-200 rounded shadow-sm">
@@ -125,6 +125,14 @@
 </template>
 
 <script>
+//TASK MOVER HELPER
+function moveItem(array, from, to) {
+  const updated = array.slice();
+  const item = updated.splice(from, 1)[0];
+  updated.splice(to, 0, item);
+  return updated;
+}
+
 export default {
   name: "todo_options_ver",
   data() {
@@ -181,8 +189,9 @@ export default {
       if (trimmed === '') {
         this.snackbarMessage('Please enter a valid task', 'error');
       } else {
+
         this.snackbarMessage('Task Added!','success');
-        this.tasks.push({text: trimmed, done: false});
+        this.tasks.push({id: crypto.randomUUID(), text: trimmed, done: false});
         this.newTask = '';
       }
     },
@@ -204,20 +213,19 @@ export default {
       this.tasks = [];
     },
     moveTaskUp(index) {
-      if (index > 0) {
-        const temp = this.tasks[index];
-        this.tasks.splice(index, 1);
-        this.tasks.splice(index - 1, 0, temp);
-      }
-    },
-
-    moveTaskDown(index) {
-      if (index < this.tasks.length - 1) {
-          const temp = this.tasks[index];
-          this.tasks.splice(index, 1);
-          this.tasks.splice(index + 1, 0, temp);
-        }
-      },
+  if (index > 0) {
+    const task = this.tasks[index];
+    this.tasks.splice(index, 1);
+    this.tasks.splice(index - 1, 0, task);
+  }
+},
+moveTaskDown(index) {
+  if (index < this.tasks.length - 1) {
+    const task = this.tasks[index];
+    this.tasks.splice(index, 1);
+    this.tasks.splice(index + 1, 0, task);
+  }
+},
     copyAllTasks() {
       const allTasksText = this.tasks.map(task => task.text).join('\n');
       navigator.clipboard.writeText(allTasksText).then(() => {
@@ -252,12 +260,22 @@ export default {
 }
 </script>
 <style>
-@keyframes fade-in-out {
-  0%{opacity: 0; transform: translateY(-10px);}
-  10%, 90% {opacity: 1; transform: translateY(0);}
-  100%{opacity: 0; transform: translateY(-10px);}
-}
+
 .animate-fade-in-out {
   animation: fade-in-out 3s ease-in-out forwards;
+}
+
+.task-move {
+  transition: transform 300ms ease;
+}
+
+.task-enter-active,
+.task-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.task-enter-from,
+.task-leave-to {
+  opacity: 0;
 }
 </style>
