@@ -121,7 +121,7 @@
     </button>
 
   </div>
-<vue3-snackbar bottom></vue3-snackbar>
+<vue3-snackbar bottom :limit = "1"></vue3-snackbar>
 </template>
 
 <script>
@@ -161,25 +161,27 @@ export default {
             type: 'success',
             text: message,
             bottom: true,
-            duration: 2000
+            duration: 2000,
+            limit: 3
           }
       )
     },
-    snackbarErrorMessage(message){
+    snackbarMessage(message, messageType){
       this.$snackbar.add(
           {
-            type: 'error',
+            type: messageType,
             text: message,
             bottom: true,
-            duration: 2000
+            duration: 2000,
           }
       )
     },
     addTask() {
       const trimmed = this.newTask.trim();
       if (trimmed === '') {
-        this.snackbarErrorMessage('Please enter a valid task');
+        this.snackbarMessage('Please enter a valid task', 'error');
       } else {
+        this.snackbarMessage('Task Added!','success');
         this.tasks.push({text: trimmed, done: false});
         this.newTask = '';
       }
@@ -189,12 +191,13 @@ export default {
     },
     removeTask(index) {
       this.tasks.splice(index, 1);
+      this.snackbarMessage('Task Removed!', 'success');
     },
     confirmClearAll() {
       const confirmed = window.confirm("Do you really want to clear all tasks?");
       if (confirmed) {
         this.clearAllTasks();
-        this.snackbarSuccessMessage('All tasks have been deleted.');
+        this.snackbarMessage('All tasks have been deleted.', 'success');
       }
     },
     clearAllTasks() {
@@ -218,7 +221,7 @@ export default {
     copyAllTasks() {
       const allTasksText = this.tasks.map(task => task.text).join('\n');
       navigator.clipboard.writeText(allTasksText).then(() => {
-        this.showToastMessage('All tasks copied to clipboard!');
+        this.snackbarMessage('All tasks copied to clipboard!', 'success');
       }).catch((err) => {
         console.error('Failed to copy tasks: ', err);
       });
@@ -228,7 +231,7 @@ export default {
     },
     saveEdit(task) {
       if (task.text.trim() === "") {
-        this.showToastMessage("Task cannot be empty.");
+        this.snackbarMessage("Task cannot be empty.", 'error');
         return;
       }
       task.text = task.text.trim();
