@@ -125,13 +125,8 @@
 </template>
 
 <script>
-//TASK MOVER HELPER
-function moveItem(array, from, to) {
-  const updated = array.slice();
-  const item = updated.splice(from, 1)[0];
-  updated.splice(to, 0, item);
-  return updated;
-}
+
+
 
 export default {
   name: "todo_options_ver",
@@ -155,14 +150,6 @@ export default {
     }
   },
   methods: {
-    showToastMessage(message){
-      this.toastMessage = message;
-      this.showToast = true;
-     setTimeout(() => {
-      this.showToast = false;
-     }, 2000
-     );
-    },
     snackbarSuccessMessage(message){
       this.$snackbar.add(
           {
@@ -279,3 +266,4 @@ moveTaskDown(index) {
   opacity: 0;
 }
 </style>
+
