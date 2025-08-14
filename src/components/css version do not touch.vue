@@ -1,249 +1,373 @@
-<!--<template>-->
-<!--  <div class="todo-container">-->
-<!--    <h1 class="todo-title">To-Do List</h1>-->
-<!--    &lt;!&ndash;Toast Message &ndash;&gt;-->
-<!--    -->
+<template>
+  <div class="todo-container">
+    <h1 class="todo-title">To-Do List</h1>
+    <!--Toast Message -->
 
-<!--    &lt;!&ndash;INPUT AREA&ndash;&gt;-->
-<!--    <div class="input-area">-->
-<!--      <input-->
-<!--          v-model="newTask"-->
-<!--          @keyup.enter="addTask"-->
-<!--          type="text"-->
-<!--          placeholder="Add a new task"-->
-<!--          class="task-input"-->
-<!--      />-->
-<!--      <button @click="addTask" class="add-button">Add</button>-->
-<!--    </div>-->
+    <!--INPUT AREA-->
+    <div class="input-area">
+      <input
+          v-model="newTask"
+          @keyup.enter="addTask"
+          type="text"
+          placeholder="Add a new task"
+          class="task-input"
+      />
+      <button @click="addTask" class="add-button">Add</button>
+    </div>
 
-<!--    <transition-group name="task" tag="div" class="task-list">-->
-<!--      <div-->
-<!--          v-for="(task, index) in tasks"-->
-<!--          :key="task.id"-->
-<!--          class="task-item"-->
-<!--      >-->
-<!--        <div class="task-text">-->
-<!--          <template v-if="task.editing">-->
-<!--            <input-->
-<!--                v-model="task.text"-->
-<!--                @keyup.enter="saveEdit(task)"-->
-<!--                @blur="saveEdit(task)"-->
-<!--                class="edit-input"-->
-<!--            />-->
-<!--          </template>-->
-<!--          <template v-else>-->
-<!--            <span :class="{ done: task.done }">-->
-<!--              {{ task.text }}-->
-<!--            </span>-->
-<!--          </template>-->
-<!--        </div>-->
+    <transition-group name="task" tag="div" class="task-list">
+      <div
+          v-for="(task, index) in tasks"
+          :key="task.id"
+          class="task-item"
+      >
+        <div class="task-text">
+          <template v-if="task.editing">
+            <input
+                v-model="task.text"
+                @keyup.enter="saveEdit(task)"
+                @blur="saveEdit(task)"
+                class="edit-input"
+            />
+          </template>
+          <template v-else>
+            <span :class="{ done: task.done }">
+              {{ task.text }}
+            </span>
+          </template>
+        </div>
 
-<!--        <div class="task-controls">-->
-<!--          <button @click.stop="moveTaskDown(index)" :disabled="index === tasks.length - 1" class="control-button">&#x25BC;</button>-->
-<!--          <button @click.stop="moveTaskUp(index)" :disabled="index === 0" class="control-button">&#x25B2;</button>-->
-<!--          <button @click.stop="toggleDone(index)" class="control-button done-button">&#x2713;</button>-->
-<!--          <button @click.stop="removeTask(index)" class="control-button delete-button">&#x2715;</button>-->
-<!--          <button @click.stop="editTask(task)" class="control-button edit-button">&#x270E;</button>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </transition-group>-->
+        <div class="task-controls">
+          <button @click.stop="moveTaskDown(index)" :disabled="index === tasks.length - 1" class="control-button">&#x25BC;</button>
+          <button @click.stop="moveTaskUp(index)" :disabled="index === 0" class="control-button">&#x25B2;</button>
+          <button @click.stop="toggleDone(index)" class="control-button done-button">&#x2713;</button>
+          <button @click.stop="removeTask(index)" class="control-button delete-button">&#x2715;</button>
+          <button @click.stop="editTask(task)" class="control-button edit-button">&#x270E;</button>
+        </div>
+      </div>
+    </transition-group>
 
-<!--    <p class="task-summary">-->
-<!--      Number of Tasks: {{ tasktotal }} | Completed Tasks: {{ completedCount }}-->
-<!--    </p>-->
+    <p class="task-summary">
+      Number of Tasks: {{ tasktotal }} | Completed Tasks: {{ completedCount }}
+    </p>
 
-<!--    <button v-if="tasks.length > 0" @click="confirmClearAll" class="clear-button">CLEAR ALL TASKS</button>-->
-<!--    <button @click="copyAllTasks" class="copy-button">Copy All Tasks</button>-->
-<!--  </div>-->
-<!--  <vue3-snackbar bottom :limit="1"></vue3-snackbar>-->
-<!--</template>-->
-<!--<style>-->
-<!--.todo-container {-->
-<!--  max-width: 600px;-->
-<!--  margin: 2rem auto;-->
-<!--  padding: 1rem;-->
-<!--  border: 1px solid #ccc;-->
-<!--  border-radius: 10px;-->
-<!--  background-color: #f9f9f9;-->
-<!--  font-family: sans-serif;-->
-<!--}-->
+    <button v-if="tasks.length > 0" @click="confirmClearAll" class="clear-button">CLEAR ALL TASKS</button>
+    <button @click="copyAllTasks" class="copy-button">Copy All Tasks</button>
+  </div>
+  <vue3-snackbar bottom :limit="1"></vue3-snackbar>
+</template>
+<style>
+.todo-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  font-family: sans-serif;
+}
 
-<!--.todo-title {-->
-<!--  text-align: center;-->
-<!--  font-size: 1.75rem;-->
-<!--  font-weight: 600;-->
-<!--  margin-bottom: 1rem;-->
-<!--}-->
+.todo-title {
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
 
-<!--.toast {-->
-<!--  position: fixed;-->
-<!--  top: 1rem;-->
-<!--  right: 1rem;-->
-<!--  background-color: black;-->
-<!--  color: white;-->
-<!--  padding: 0.5rem 1rem;-->
-<!--  border-radius: 5px;-->
-<!--  z-index: 1000;-->
-<!--  animation: fade-in-out 3s ease-in-out forwards;-->
-<!--}-->
+.toast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background-color: black;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  z-index: 1000;
+  animation: fade-in-out 3s ease-in-out forwards;
+}
 
-<!--.input-area {-->
-<!--  display: flex;-->
-<!--  margin-bottom: 1rem;-->
-<!--}-->
+.input-area {
+  display: flex;
+  margin-bottom: 1rem;
 
-<!--.task-input {-->
-<!--  flex: 1;-->
-<!--  padding: 0.5rem;-->
-<!--  font-size: 1rem;-->
-<!--  border: 1px solid #aaa;-->
-<!--  border-radius: 4px 0 0 4px;-->
-<!--}-->
+}
 
-<!--.add-button {-->
-<!--  padding: 0.5rem 1rem;-->
-<!--  background-color: #007bff;-->
-<!--  color: white;-->
-<!--  border: 1px solid #007bff;-->
-<!--  border-left: none;-->
-<!--  border-radius: 0 4px 4px 0;-->
-<!--  cursor: pointer;-->
-<!--}-->
+.task-input {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #aaa;
+  border-radius: 4px 0 0 4px;
+}
 
-<!--.add-button:hover {-->
-<!--  background-color: #0056b3;-->
-<!--}-->
+.task-input:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1px #aaa; /* barely-there focus ring */
+}
 
-<!--.task-list {-->
-<!--  display: flex;-->
-<!--  flex-direction: column;-->
-<!--  gap: 0.5rem;-->
-<!--}-->
+.add-button {
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
 
-<!--.task-item {-->
-<!--  display: flex;-->
-<!--  justify-content: space-between;-->
-<!--  background-color: #ddd;-->
-<!--  padding: 0.5rem;-->
-<!--  border-radius: 5px;-->
-<!--}-->
+.add-button:hover {
+  background-color: #0056b3;
+}
 
-<!--.task-item:hover {-->
-<!--  background-color: #ccc;-->
-<!--}-->
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
-<!--.task-text {-->
-<!--  flex: 1;-->
-<!--  word-break: break-word;-->
-<!--}-->
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  background-color: #ddd;
+  padding: 0.5rem;
+  border-radius: 5px;
+}
 
-<!--.edit-input {-->
-<!--  width: 100%;-->
-<!--  padding: 0.25rem;-->
-<!--  font-size: 0.9rem;-->
-<!--  border: 1px solid #888;-->
-<!--  border-radius: 4px;-->
-<!--}-->
+.task-item:hover {
+  background-color: #ccc;
+}
 
-<!--.task-controls {-->
-<!--  display: flex;-->
-<!--  gap: 0.25rem;-->
-<!--  margin-left: 0.5rem;-->
-<!--}-->
+.task-text {
+  flex: 1;
+  word-break: break-word;
+}
 
-<!--.control-button {-->
-<!--  width: 24px;-->
-<!--  height: 24px;-->
-<!--  display: flex;-->
-<!--  align-items: center;-->
-<!--  justify-content: center;-->
-<!--  border: none;-->
-<!--  background: none;-->
-<!--  cursor: pointer;-->
-<!--  font-size: 0.9rem;-->
-<!--  color: #333;-->
-<!--}-->
+.edit-input {
+  width: 100%;
+  padding: 0.25rem;
+  font-size: 0.9rem;
+  border: 1px solid #888;
+  border-radius: 4px;
+}
 
-<!--.control-button:hover {-->
-<!--  background-color: #e0e0e0;-->
-<!--  border-radius: 3px;-->
-<!--}-->
+.task-controls {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: 0.5rem;
+}
 
-<!--.done-button {-->
-<!--  color: green;-->
-<!--}-->
+.control-button {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+}
 
-<!--.delete-button {-->
-<!--  color: red;-->
-<!--}-->
+.control-button:hover {
+  background-color: #e0e0e0;
+  border-radius: 3px;
+}
 
-<!--.edit-button {-->
-<!--  color: blue;-->
-<!--}-->
+.done-button {
+  color: green;
+}
 
-<!--.task-summary {-->
-<!--  text-align: center;-->
-<!--  background-color: #e0f7fa;-->
-<!--  color: #00796b;-->
-<!--  border: 1px solid #b2ebf2;-->
-<!--  padding: 0.5rem;-->
-<!--  border-radius: 5px;-->
-<!--  margin-top: 1rem;-->
-<!--}-->
+.delete-button {
+  color: red;
+}
 
-<!--.clear-button,-->
-<!--.copy-button {-->
-<!--  display: block;-->
-<!--  margin: 1rem auto 0;-->
-<!--  padding: 0.5rem 1rem;-->
-<!--  font-size: 1rem;-->
-<!--  border-radius: 5px;-->
-<!--  cursor: pointer;-->
-<!--  color: white;-->
-<!--  border: none;-->
-<!--}-->
+.edit-button {
+  color: blue;
+}
 
-<!--.clear-button {-->
-<!--  background-color: #e53935;-->
-<!--}-->
+.task-summary {
+  text-align: center;
+  background-color: #e0f7fa;
+  color: #00796b;
+  border: 1px solid #b2ebf2;
+  padding: 0.5rem;
+  border-radius: 5px;
+  margin-top: 1rem;
+}
 
-<!--.clear-button:hover {-->
-<!--  background-color: #c62828;-->
-<!--}-->
+.clear-button,
+.copy-button {
+  display: block;
+  margin: 1rem auto 0;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+  border: none;
+}
 
-<!--.copy-button {-->
-<!--  background-color: #43a047;-->
-<!--}-->
+.clear-button {
+  background-color: #e53935;
+}
 
-<!--.copy-button:hover {-->
-<!--  background-color: #2e7d32;-->
-<!--}-->
+.clear-button:hover {
+  background-color: #c62828;
+}
 
-<!--.done {-->
-<!--  text-decoration: line-through;-->
-<!--  color: #888;-->
-<!--}-->
+.copy-button {
+  background-color: #43a047;
+}
 
-<!--@keyframes fade-in-out {-->
-<!--  0% { opacity: 0; }-->
-<!--  10% { opacity: 1; }-->
-<!--  90% { opacity: 1; }-->
-<!--  100% { opacity: 0; }-->
-<!--}-->
+.copy-button:hover {
+  background-color: #2e7d32;
+}
 
-<!--.task-move {-->
-<!--  transition: transform 300ms ease;-->
-<!--}-->
+.done {
+  text-decoration: line-through;
+  color: #888;
+}
 
-<!--.task-enter-active,-->
-<!--.task-leave-active {-->
-<!--  transition: opacity 0.3s ease;-->
-<!--}-->
+@keyframes fade-in-out {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
 
-<!--.task-enter-from,-->
-<!--.task-leave-to {-->
-<!--  opacity: 0;-->
-<!--}-->
-<!--</style>-->
-<!--<script setup lang="ts">-->
-<!--</script>-->
+.task-move {
+  transition: transform 300ms ease;
+}
+
+.task-enter-active,
+.task-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.task-enter-from,
+.task-leave-to {
+  opacity: 0;
+}
+</style>
+<script>
+
+
+export default {
+  name: "todo_css_ver",
+  data() {
+    return {
+      toastMessage: '',
+      showToast: false,
+      newTask: '',
+      tasks: (JSON.parse(localStorage.getItem("tasks")) || []).map(task => ({
+        ...task,
+        editing: false
+      })),
+    }
+  },
+  watch: {
+    tasks: {
+      handler(newTasks) {
+        localStorage.setItem('tasks', JSON.stringify(newTasks));
+      },
+      deep: true
+    }
+  },
+  methods: {
+    snackbarSuccessMessage(message){
+      this.$snackbar.add(
+          {
+            type: 'success',
+            text: message,
+            bottom: true,
+            duration: 2000,
+            limit: 3
+          }
+      )
+    },
+    snackbarMessage(message, messageType){
+      this.$snackbar.add(
+          {
+            type: messageType,
+            text: message,
+            bottom: true,
+            duration: 2000,
+          }
+      )
+    },
+    addTask() {
+      const trimmed = this.newTask.trim();
+      if (trimmed === '') {
+        this.snackbarMessage('Please enter a valid task', 'error');
+      } else {
+
+        this.snackbarMessage('Task Added!','success');
+        this.tasks.push({id: crypto.randomUUID(), text: trimmed, done: false});
+        this.newTask = '';
+      }
+    },
+    toggleDone(index) {
+      this.tasks[index].done = !this.tasks[index].done;
+    },
+    removeTask(index) {
+      this.tasks.splice(index, 1);
+      this.snackbarMessage('Task Removed!', 'success');
+    },
+    confirmClearAll() {
+      const confirmed = window.confirm("Do you really want to clear all tasks?");
+      if (confirmed) {
+        this.clearAllTasks();
+        this.snackbarMessage('All tasks have been deleted.', 'success');
+      }
+    },
+    clearAllTasks() {
+      this.tasks = [];
+    },
+    moveTaskUp(index) {
+      if (index > 0) {
+        const task = this.tasks[index];
+        this.tasks.splice(index, 1);
+        this.tasks.splice(index - 1, 0, task);
+      }
+    },
+    moveTaskDown(index) {
+      if (index < this.tasks.length - 1) {
+        const task = this.tasks[index];
+        this.tasks.splice(index, 1);
+        this.tasks.splice(index + 1, 0, task);
+      }
+    },
+    copyAllTasks() {
+      const allTasksText = this.tasks.map(task => task.text).join('\n');
+      navigator.clipboard.writeText(allTasksText).then(() => {
+        this.snackbarMessage('All tasks copied to clipboard!', 'success');
+      }).catch((err) => {
+        console.error('Failed to copy tasks: ', err);
+      });
+    },
+    editTask(task) {
+      task.editing = true;
+    },
+    saveEdit(task) {
+      if (task.text.trim() === "") {
+        this.snackbarMessage("Task cannot be empty.", 'error');
+        return;
+      }
+      task.text = task.text.trim();
+      task.editing = false;
+    }
+  },
+
+
+  computed: {
+    tasktotal() {
+      return this.tasks.length;
+    },
+    completedCount() {
+      return this.tasks.filter((task) => task.done).length;
+    }
+  }
+  //GIRL I SWEAR TO GOD IF THIS WORKS
+}
+</script>
